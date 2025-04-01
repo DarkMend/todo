@@ -28,14 +28,15 @@ export default function NoteItem({ note, setNotesList, href }: INoteItem) {
     <div
       className={`${styles.noteItem} ${note.status == 2 && styles.completed} `}
     >
-      <div className={`${note.status == 2 && styles.line}`}></div>
-      <button
-        className={styles.button}
-        disabled={note.status == 2}
-        onClick={changeStatus}
-      >
-        <Check />
-      </button>
+      <div>
+        <button
+          className={styles.button}
+          disabled={note.status == 2}
+          onClick={changeStatus}
+        >
+          <Check />
+        </button>
+      </div>
       <div className={styles.text}>{note.text}</div>
     </div>
   );

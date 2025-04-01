@@ -9,15 +9,12 @@
   gap: 10px;
   position: relative;
 
+  .text {
+    word-break: break-all;
+  }
+
   &.completed {
     opacity: 0.5;
-
-    .line {
-      position: absolute;
-      width: 90%;
-      height: 2px;
-      background: rgb(124, 124, 124);
-    }
 
     .button {
       cursor: default;
