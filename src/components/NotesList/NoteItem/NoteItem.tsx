@@ -1,13 +1,15 @@
 import { Check } from "lucide-react";
 import { INote } from "../../../interfaces/note";
 import styles from "./NoteItem.module.scss";
+import { hrefState } from "../../../App";
 
 export interface INoteItem {
   note: INote;
-  setNotesList: (data: INote[]) => void;
+  setNotesList: (type: boolean, typeHref: hrefState) => void;
+  href: hrefState;
 }
 
-export default function NoteItem({ note, setNotesList }: INoteItem) {
+export default function NoteItem({ note, setNotesList, href }: INoteItem) {
   const changeStatus = () => {
     const notes = localStorage.getItem("notes");
     if (!notes) {
@@ -19,7 +21,7 @@ export default function NoteItem({ note, setNotesList }: INoteItem) {
       item.id == note.id ? { ...item, status: 2 } : item
     );
     localStorage.setItem("notes", JSON.stringify(updateNotes));
-    setNotesList(updateNotes);
+    setNotesList(true, href);
   };
 
   return (

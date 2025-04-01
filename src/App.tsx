@@ -6,40 +6,40 @@ import { useEffect, useState } from "react";
 import NotesList from "./components/NotesList/NotesList";
 import { INote } from "./interfaces/note";
 
+export type hrefState = "all" | "active" | "completed" | "";
+
 export default function App() {
   const [activeInput, setActiveInput] = useState(false);
   const [notesList, setNotesList] = useState<INote[]>([]);
-  const [hrefActive, setHrefActive] = useState<
-    "all" | "active" | "completed" | ""
-  >("all");
+  const [hrefActive, setHrefActive] = useState<hrefState>("all");
   const [notes, setNotes] = useState<INote[]>([]);
 
-  const loadNotes = () => {
+  const loadNotes = (filter: boolean = false, typeHref: hrefState = "all") => {
     const notesStorage = localStorage.getItem("notes");
-    setNotesList(notesStorage && JSON.parse(notesStorage));
+    if (notesStorage) {
+      setNotesList(notesStorage && JSON.parse(notesStorage));
+      filter && filterNotes(JSON.parse(notesStorage), typeHref);
+    }
   };
 
   useEffect(() => {
-    loadNotes();
+    loadNotes(true);
   }, []);
 
-  useEffect(() => {
-    let fiteredList = notesList;
-    if (hrefActive == "active")
-      fiteredList = notesList.filter((item) => item.status == 1);
-    if (hrefActive == "completed")
-      fiteredList = notesList.filter((item) => item.status == 2);
-    setNotes(fiteredList);
-  }, [hrefActive, notesList]);
-
-  const changeNotesList = (data: INote[]) => {
-    setNotesList(data);
+  const filterNotes = (notes: INote[], filterType: hrefState) => {
+    setActiveInput(false);
+    setHrefActive(filterType);
+    if (filterType === "active") {
+      setNotes(notes.filter((item) => item.status === 1));
+    } else if (filterType === "completed")
+      setNotes(notes.filter((item) => item.status === 2));
+    else setNotes(notes);
   };
 
   const removeNotes = () => {
     const removedNotes = notesList.filter((item) => item.status == 1);
     localStorage.setItem("notes", JSON.stringify([...removedNotes]));
-    loadNotes();
+    loadNotes(true, hrefActive);
   };
 
   return (
@@ -50,7 +50,11 @@ export default function App() {
           {activeInput ? (
             <CreateNote loadNotes={loadNotes} />
           ) : (
-            <NotesList notes={notes} setNotesList={changeNotesList} />
+            <NotesList
+              notes={notes}
+              setNotesList={loadNotes}
+              href={hrefActive}
+            />
           )}
         </div>
         <div className={styles.hr}></div>
@@ -61,21 +65,19 @@ export default function App() {
           </div>
           <div className={styles.nav}>
             <a
-              onClick={() => (setActiveInput(false), setHrefActive("all"))}
+              onClick={() => filterNotes(notesList, "all")}
               className={`${hrefActive == "all" && styles.active}`}
             >
               All
             </a>
             <a
-              onClick={() => (setActiveInput(false), setHrefActive("active"))}
+              onClick={() => filterNotes(notesList, "active")}
               className={`${hrefActive == "active" && styles.active}`}
             >
               Active
             </a>
             <a
-              onClick={() => (
-                setActiveInput(false), setHrefActive("completed")
-              )}
+              onClick={() => filterNotes(notesList, "completed")}
               className={`${hrefActive == "completed" && styles.active}`}
             >
               Completed
@@ -84,9 +86,7 @@ export default function App() {
           <div className={styles.actions}>
             <button
               className={styles.button}
-              onClick={() => (
-                setActiveInput((state) => !state), setHrefActive("")
-              )}
+              onClick={() => (setActiveInput(true), setHrefActive(""))}
             >
               <FilePlus2 />
             </button>
