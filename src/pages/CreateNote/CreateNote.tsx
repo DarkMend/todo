@@ -4,7 +4,7 @@ import Input from "../../components/Input/Input";
 import styles from "./CreateNote.module.scss";
 import { IMessage } from "../../interfaces/message";
 
-export default function CreateNote() {
+export default function CreateNote({ loadNotes }: { loadNotes: () => void }) {
   const [input, setInput] = useState("");
   const [message, setMessage] = useState<IMessage>({
     body: "",
@@ -39,6 +39,7 @@ export default function CreateNote() {
     const updateNote = [...currentNotes, newNote];
     localStorage.setItem("notes", JSON.stringify(updateNote));
     setMessage({ type: "success", body: "Запись сохранена" });
+    loadNotes();
     setTimeout(() => {
       setInput("");
       setMessage({ type: null, body: "" });
